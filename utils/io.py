@@ -31,7 +31,7 @@ class Ingredient:
     quantity: float
     unit: UnitOfMeasurement
 
-    def tight_dict(self) -> dict:
+    def tight_dict(self) -> dict[str, str | float | UnitOfMeasurement]:
         """
         Returns "cleaned-up" version of dictionary, that
         Question.__dict__ usually returns. Without classes names

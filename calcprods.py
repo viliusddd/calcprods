@@ -27,7 +27,7 @@ from simple_term_menu import TerminalMenu
 from utils.consts import *
 from utils.io import Data
 from utils.io import Ingredient
-from utils.utils import print_out, print_list, split_str_to_ints
+from utils.utils import print_dict, print_list, split_str_to_ints
 
 
 type IngredientDict = dict[str, list[Ingredient]]
@@ -51,15 +51,21 @@ class Calcprods:
     def days(self) -> list[int]:
         return self._days
 
-    def _compare_ingredients(self, ingr_a: Ingredient, ingr_b: Ingredient) -> Ingredient | None:
+    def _compare_ingredients(self, ingr_a: Ingredient, ingr_b: Ingredient, subtract = False) -> Ingredient | None:
         '''
         Merge same name Ingredient objs.
         '''
-        if ingr_b.name == ingr_a.name:
+        if ingr_a.name == ingr_b.name:
+
+            if subtract:
+                quantity = ingr_a.quantity - ingr_b.quantity
+            else:
+                quantity = ingr_a.quantity + ingr_b.quantity
+
             return Ingredient(
-                name=ingr_b.name,
-                quantity=round(ingr_b.quantity - ingr_a.quantity, 2),
-                unit=ingr_b.unit
+                name=ingr_a.name,
+                quantity=round(quantity, 2),
+                unit=ingr_a.unit
             )
 
     def _merge_duplicates(self, ingredients: list[Ingredient]) -> list[Ingredient]:
@@ -101,11 +107,13 @@ class Calcprods:
         Returns:
             IngredientDict: only the requested days.
         '''
-        new_data = {}
+        filtered_by_days = {}
+
         for day_name, day_val in self.data.menu.items():
             if int(day_name[3]) in self.days:
-                new_data[day_name] = day_val
-        return new_data
+                filtered_by_days[day_name] = day_val
+
+        return filtered_by_days
 
     def list_ingredients(self) -> list[Ingredient]:
         '''
@@ -119,6 +127,7 @@ class Calcprods:
 
         for k, v in self.data.menu.items():
             day_num = int(k[3])
+
             if day_num in self.days:
                 filtered_ingredients[k] = v
 
@@ -138,6 +147,7 @@ class Calcprods:
             list: list of Ingredient objs without quantity values.
         '''
         stock: list[Ingredient] = copy.deepcopy(self.list_ingredients())
+
         for i in stock:
             i.quantity = ''
 
@@ -162,7 +172,7 @@ class Calcprods:
         for ingr in required_ingredients:
             ingr.quantity *= self.people
             for stock_ingr in instock_ingredients:
-                if new_ingr := self._compare_ingredients(stock_ingr, ingr):
+                if new_ingr := self._compare_ingredients(ingr, stock_ingr):
                     processed_ingredients.append(new_ingr)
 
         return processed_ingredients
@@ -184,7 +194,8 @@ def main() -> None:
         menu_entry_index = terminal_menu.show()
 
         if menu_entry_index == 0:
-            data.write_csv(STOCK_OUT_PATH, cp.get_empty_instock_list())
+            instock = cp.get_empty_instock_list()
+            data.write_csv(STOCK_OUT_PATH, instock)
         elif menu_entry_index == 1:
             data.write_csv(PREP_OUT_PATH, cp.get_order_list())
 

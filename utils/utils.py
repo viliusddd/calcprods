@@ -14,7 +14,7 @@ def print_list(input: list[Ingredient]) -> None:
     print(tabulate_data(input))
 
 
-def print_out(input: dict) -> None:
+def print_dict(input: dict) -> None:
     for day, products in input.items():
         print(f'{day.capitalize()}:')
         print(tabulate_data(products))
