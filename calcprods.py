@@ -9,7 +9,7 @@ multiple times a year.
 Usage: calcprods [-osnm] [-p PEOPLE] [-d DAYS] [-v|-vv|-q]
 
 Try:
-  python calcprods.py -p 25 -d 2-6
+  python calcprods.py -p25 -d2-6
   python calcprods.py -p 60 -d 1,2,7 -s --nomenu
   python calcprods.py -nm -vv
 
@@ -175,12 +175,18 @@ class Calcprods:
         required_ingredients: list[Ingredient] = self.list_ingredients()
         instock_ingredients = self.data.read_csv(STOCK_IN_PATH)
 
+        if len(required_ingredients) != len(instock_ingredients):
+            raise ValueError(
+                f'Length of `{STOCK_IN_PATH}` and current order doesn\'t match. '
+                f'Make sure that `{STOCK_IN_PATH}` was generated using same '
+                'days nd people values as is used now.')
+
         processed_ingredients: list[Ingredient] = []
 
         for ingr in required_ingredients:
             ingr.quantity *= self.people
             for stock_ingr in instock_ingredients:
-                if new_ingr := self._compare_ingredients(ingr, stock_ingr):
+                if new_ingr := self._compare_ingredients(ingr, stock_ingr, subtract=True):
                     processed_ingredients.append(new_ingr)
 
         return processed_ingredients
