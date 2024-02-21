@@ -1,15 +1,16 @@
 #! .venv/bin/python3
 '''
 Generate list of ingredients with the quantity for particular number of
-days and people. This app is can be used in multiple day retreat kitchens,
-but it is optimized for Dhamma.org meditation center kitchen, where
-courses happen multiple times a year.
+days and people. Get the nutrition values of ingredients.
+This app iscan be used in multiple day retreat kitchens, but it is
+optimized for Dhamma.org meditation center kitchen, where courses happen
+multiple times a year.
 
 Usage: calcprods [-osnm] [-p PEOPLE] [-d DAYS] [-v|-vv|-q]
 
 Try:
   python calcprods.py -p 25 -d 2-6
-  python calcprods.py -p 60 -d 1,2,7 --nomenu -s
+  python calcprods.py -p 60 -d 1,2,7 -s --nomenu
   python calcprods.py -nm -vv
 
 Options:
@@ -32,8 +33,9 @@ from docopt import docopt
 from simple_term_menu import TerminalMenu
 
 from utils.consts import *
-from utils.data import Data, UnitOfMeasurement, Ingredient
-from utils.utils import split_str_to_ints, get_api_response, print_dict, print_list
+from utils.data import Data, Ingredient
+from utils.utils import split_str_to_ints, print_dict, print_list
+from utils.nutrition import get_nutrition
 
 
 type IngredientDict = dict[str, list[Ingredient]]
@@ -183,82 +185,6 @@ class Calcprods:
 
         return processed_ingredients
 
-    def get_nutrition(self) -> list[dict[str, str]]:
-        '''
-        Get nutritional values and percentages for ingredients from
-        calorieninjas.com api.
-
-        Returns:
-            list[dict[str, str]]: example: [{
-                'Name': 'basil',
-                'Calories kcal': 24.4,
-                'Carbs g': 2.0,
-                'Protein g': 4.0,
-                'Fat g': 0.0,
-                'Macros %': '33/67/0'}, {...}
-            ]
-        '''
-        url = 'https://api.calorieninjas.com/v1/nutrition?query='
-        headers = {'X-Api-Key': FOOD_API_KEY}
-
-        queries: list[str] = [i.name for i in self.list_ingredients()]
-        ingr_with_macros: list[dict[str, str]] = []
-
-        for query in queries:
-            if response := get_api_response(url + query, headers):
-                if macros := self.assign_macros_to_ingr(response):
-                    ingr_with_macros.append(macros)
-
-        return ingr_with_macros
-
-    def assign_macros_to_ingr(self, response: dict[str, str]) -> dict[str, str] | None:
-        '''
-        Create dict with ingredient and it's macro values, add macros in
-        percentages.
-
-        Args:
-            response (dict[str, str]): api response from food api.
-
-        Returns:
-            dict[str, str] | None: dict with reassgned values, added macros %.
-        '''
-        for item in response['items']:
-            if macro_perc := self.count_macros(item):
-                macros = f'{macro_perc[0]:.0f}/{macro_perc[1]:.0f}/{macro_perc[2]:.0f}'
-            else:
-                macros = '0%'
-
-            return {
-                'Name': item['name'],
-                'Calories kcal': item['calories'],
-                'Carbs g': item['carbohydrates_total_g'],
-                'Protein g': item['protein_g'],
-                'Fat g': item['fat_total_g'],
-                'Macros %': macros,
-            }
-
-    def count_macros(self, item: dict[str, str]) -> list[float] | None:
-        '''Calculate carbs, protein and fat percentages.
-
-        Each gram of carbohydrates provides 4 calories, protein 4 and
-        fat 9 calories.
-
-        Args:
-            item (dict[str, str]): food item and its values.
-
-        Returns:
-            list[float] | None: list of macro values in %, e.g. [60, 90, 10].
-        '''
-        if item['calories']:
-
-            carbs = 4 * float(item['carbohydrates_total_g'])
-            protein = 4 * float(item['protein_g'])
-            fat = 9 * float(item['fat_total_g'])
-
-            total = carbs + protein + fat
-
-            return [macro * 100 / total for macro in (carbs, protein, fat)]
-
 
 def main() -> None:
     args = docopt(__doc__, version='0.01')
@@ -290,7 +216,7 @@ def main() -> None:
     elif args['--instock-list']:
         data.write_csv(STOCK_OUT_PATH, cp.get_empty_instock_list())
     elif args['--nutrition']:
-        data.write_csv(NUTRITION_OUT_PATH, cp.get_nutrition())
+        data.write_csv(NUTRITION_OUT_PATH, get_nutrition(cp.get_empty_instock_list()))
 
 
 if __name__ == '__main__':
