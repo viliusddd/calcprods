@@ -1,5 +1,5 @@
 from calcprods import Calcprods
-from utils.io import Data, Ingredient, UnitOfMeasurement
+from utils.data import Data, Ingredient, UnitOfMeasurement
 from utils.consts import *
 
 

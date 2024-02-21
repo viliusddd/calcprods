@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from utils.io import Data, Ingredient, UnitOfMeasurement
+from utils.data import Data, Ingredient, UnitOfMeasurement
 
 
 def test_tight_dict():

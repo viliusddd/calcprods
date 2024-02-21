@@ -5,19 +5,26 @@ days and people. This app is can be used in multiple day retreat kitchens,
 but it is optimized for Dhamma.org meditation center kitchen, where
 courses happen multiple times a year.
 
-Usage: calcprods [-os] [-p PEOPLE] [-d DAYS] [--nomenu]
+Usage: calcprods [-osnm] [-p PEOPLE] [-d DAYS] [-v|-vv|-q]
 
 Try:
   python calcprods.py -p 25 -d 2-6
   python calcprods.py -p 60 -d 1,2,7 --nomenu -s
+  python calcprods.py -nm -vv
 
 Options:
-  -s --instock-list         Generate empty instock list.
-  -o --order-list           Generate order list.
-  -p --people NUMBER        Number of peaople. [default: 70]
-  -d --days NUMBER          Number of days. In 1 or 1-3 or 1,2,5 form.
-                            [default: 0-10]
-  --nomenu                  Skip menu selection and use switches instead.
+  -h --help           Show this screen and exit.
+  -s --instock-list   Generate empty instock list.
+  -o --order-list     Generate order list.
+  -p --people NUMBER  Number of peaople. [default: 70]
+  -d --days NUMBER    Number of days. In 1 or 1-3 or 1,2,5 form.
+                      [default: 0-10]
+  -m --nomenu         Skip menu selection and use switches instead.
+  -n --nutrition      It requires calorieninjas.com api key as
+                      FOOD_API_KEY environment variable.
+  -v --verbose        Increase verbosity.
+  -vv                 Very verbose: print tabulated data to terminal.
+  -q --quiet          Decrease verbosity.
 '''
 import copy
 
@@ -25,9 +32,8 @@ from docopt import docopt
 from simple_term_menu import TerminalMenu
 
 from utils.consts import *
-from utils.io import Data
-from utils.io import Ingredient
-from utils.utils import print_dict, print_list, split_str_to_ints
+from utils.data import Data, UnitOfMeasurement, Ingredient
+from utils.utils import split_str_to_ints, get_api_response, print_dict, print_list
 
 
 type IngredientDict = dict[str, list[Ingredient]]
@@ -177,6 +183,82 @@ class Calcprods:
 
         return processed_ingredients
 
+    def get_nutrition(self) -> list[dict[str, str]]:
+        '''
+        Get nutritional values and percentages for ingredients from
+        calorieninjas.com api.
+
+        Returns:
+            list[dict[str, str]]: example: [{
+                'Name': 'basil',
+                'Calories kcal': 24.4,
+                'Carbs g': 2.0,
+                'Protein g': 4.0,
+                'Fat g': 0.0,
+                'Macros %': '33/67/0'}, {...}
+            ]
+        '''
+        url = 'https://api.calorieninjas.com/v1/nutrition?query='
+        headers = {'X-Api-Key': FOOD_API_KEY}
+
+        queries: list[str] = [i.name for i in self.list_ingredients()]
+        ingr_with_macros: list[dict[str, str]] = []
+
+        for query in queries:
+            if response := get_api_response(url + query, headers):
+                if macros := self.assign_macros_to_ingr(response):
+                    ingr_with_macros.append(macros)
+
+        return ingr_with_macros
+
+    def assign_macros_to_ingr(self, response: dict[str, str]) -> dict[str, str] | None:
+        '''
+        Create dict with ingredient and it's macro values, add macros in
+        percentages.
+
+        Args:
+            response (dict[str, str]): api response from food api.
+
+        Returns:
+            dict[str, str] | None: dict with reassgned values, added macros %.
+        '''
+        for item in response['items']:
+            if macro_perc := self.count_macros(item):
+                macros = f'{macro_perc[0]:.0f}/{macro_perc[1]:.0f}/{macro_perc[2]:.0f}'
+            else:
+                macros = '0%'
+
+            return {
+                'Name': item['name'],
+                'Calories kcal': item['calories'],
+                'Carbs g': item['carbohydrates_total_g'],
+                'Protein g': item['protein_g'],
+                'Fat g': item['fat_total_g'],
+                'Macros %': macros,
+            }
+
+    def count_macros(self, item: dict[str, str]) -> list[float] | None:
+        '''Calculate carbs, protein and fat percentages.
+
+        Each gram of carbohydrates provides 4 calories, protein 4 and
+        fat 9 calories.
+
+        Args:
+            item (dict[str, str]): food item and its values.
+
+        Returns:
+            list[float] | None: list of macro values in %, e.g. [60, 90, 10].
+        '''
+        if item['calories']:
+
+            carbs = 4 * float(item['carbohydrates_total_g'])
+            protein = 4 * float(item['protein_g'])
+            fat = 9 * float(item['fat_total_g'])
+
+            total = carbs + protein + fat
+
+            return [macro * 100 / total for macro in (carbs, protein, fat)]
+
 
 def main() -> None:
     args = docopt(__doc__, version='0.01')
@@ -189,7 +271,8 @@ def main() -> None:
 
     if not args['--nomenu']:
         options: list[str] = ['[1] Generate stock list with empty values',
-                   '[2] Calculate ePromo order list']
+                              '[2] Calculate ePromo order list',
+                              '[3] Get nutritional values']
         terminal_menu = TerminalMenu(options)
         menu_entry_index = terminal_menu.show()
 
@@ -198,12 +281,16 @@ def main() -> None:
             data.write_csv(STOCK_OUT_PATH, instock)
         elif menu_entry_index == 1:
             data.write_csv(PREP_OUT_PATH, cp.get_order_list())
+        elif menu_entry_index == 2:
+            cp.get_nutrition()
 
     if args['--order-list']:
         data.write_csv(PREP_OUT_PATH, cp.get_order_list())
         # print_list(cp.get_order_list())
     elif args['--instock-list']:
         data.write_csv(STOCK_OUT_PATH, cp.get_empty_instock_list())
+    elif args['--nutrition']:
+        data.write_csv(NUTRITION_OUT_PATH, cp.get_nutrition())
 
 
 if __name__ == '__main__':

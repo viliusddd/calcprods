@@ -1,6 +1,6 @@
 import pytest
 
-from utils.io import Data
+from utils.data import Data
 from calcprods import Calcprods
 from utils.utils import (
     tabulate_data, print_dict, print_list, split_str_to_ints

@@ -31,7 +31,7 @@ class Ingredient:
     quantity: float
     unit: UnitOfMeasurement
 
-    def tight_dict(self) -> dict[str, str | float | UnitOfMeasurement]:
+    def tight_dict(self) -> dict[str, str | float]:
         """
         Returns "cleaned-up" version of dictionary, that
         Question.__dict__ usually returns. Without classes names
@@ -123,17 +123,26 @@ class Data:
                 ))
         return day
 
-    def write_csv(self, filepath: Path, data) -> None:
+    def write_csv(self, filepath: Path, data: list[Ingredient] | list[dict[str, str]]) -> None:
         '''
-        Write CSV file.
-        '''
-        path: str = os.path.split(filepath)[0]
+        Write data to CSV file. Data can be either list of Ingredient
+        object or list of dicts.
 
-        if not os.path.exists(path):
-            os.makedirs(path)
+        Args:
+            filepath (Path): filepath of CSV file.
+            data (list[Ingredient] | list[dict[str, str]]): either list
+                of Ingredient objs or list of ingredients nutritional data.
+        '''
+        Path(filepath).resolve().parent.mkdir(parents=True, exist_ok=True)
+
+        if isinstance(data[0], Ingredient):
+            data = [i.tight_dict() for i in data]
+
+        fieldnames = [item for item in data[0]]
 
         with open(filepath, 'w') as file:
-            fieldnames = ['name', 'unit', 'quantity']
+
             writer = csv.DictWriter(file, fieldnames=fieldnames)
             writer.writeheader()
-            writer.writerows([i.tight_dict() for i in data])
+
+            writer.writerows(data)

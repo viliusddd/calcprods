@@ -1,11 +1,14 @@
+import requests
+
 from tabulate import tabulate
 
-from utils.io import Ingredient
+from utils.data import Ingredient
 
 
 def tabulate_data(rows: list[Ingredient]) -> str:
     for row in rows:
-        row.unit = row.unit.value
+        if 'unit' in row:
+            row.unit = row.unit.value
 
     return tabulate(rows, headers='keys', tablefmt='rounded_grid', showindex=True)
 
@@ -44,3 +47,24 @@ def split_str_to_ints(digits: str) -> list[int]:
         raise ValueError('Wrong digit or digits range.')
 
     return nums
+
+
+def get_api_response(url: str, headers=None) -> dict[str, str] | None:
+    """
+    Connect to chosen api and return json response.
+
+    Args:
+        url (str): api url address.
+        headers (str | None): headers.
+
+    Returns:
+        dict[str, str] | None: response from api.
+    """
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as exc:
+        print(f'FAILED: {exc}')
+    else:
+        return response.json()

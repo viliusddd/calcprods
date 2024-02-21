@@ -1,3 +1,5 @@
+import os
+
 from pathlib import Path
 
 
@@ -11,3 +13,6 @@ PREP_IN_PATH = Path(DATA_DIR, PREP_FILENAME)
 
 STOCK_OUT_PATH = Path(OUTPUT_DIR, STOCK_FILENAME)
 PREP_OUT_PATH = Path(OUTPUT_DIR, PREP_FILENAME)
+
+NUTRITION_OUT_PATH = Path(OUTPUT_DIR, 'nutrition.csv')
+FOOD_API_KEY = os.getenv('FOOD_API_KEY')
