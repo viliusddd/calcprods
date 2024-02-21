@@ -1,9 +1,8 @@
-CalcProds App
+# CalcProds App
+
+## Setup development environment
 
 Requires python 3.12
-
-Setup development environment: 
-
 1. Create virtual environment and install requirements:
     ```bash
     python3.12 -m venv .venv
@@ -15,6 +14,7 @@ Setup development environment:
     echo 'export FOOD_API_KEY="<your_api_key_goes_here>"' >> ~/.zshrc
     ```
 
+## Command Line Interface Help
 ```
 Generate list of ingredients with the quantity for particular number of days and people. Get the nutrition values of ingredients.
 This app is can be used in multiple day retreat kitchens, but it is optimized for Dhamma.org meditation center kitchen, where courses happen multiple times a year.
