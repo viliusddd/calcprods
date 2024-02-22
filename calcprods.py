@@ -23,7 +23,7 @@ Options:
   -d --days NUMBER    Number of days. In 1 or 1-3 or 1,2,5 form.
                       [default: 0-10]
   -m --nomenu         Skip menu selection and use switches instead.
-  -v                  Print output table to screen.
+  -v                  Print output table to the terminal.
 '''
 import copy
 
