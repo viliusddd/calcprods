@@ -6,7 +6,7 @@ This app iscan be used in multiple day retreat kitchens, but it is
 optimized for Dhamma.org meditation center kitchen, where courses happen
 multiple times a year.
 
-Usage: calcprods [-osnm] [-p PEOPLE] [-d DAYS] [-v]
+Usage: calcprods [-s|-o|-n] [-p PEOPLE] [-d DAYS] [-vmh]
 
 Try:
   python calcprods.py -p25 -d2-6
@@ -15,14 +15,14 @@ Try:
 
 Options:
   -h --help           Show this screen and exit.
-  -s --instock-list   Generate empty instock list.
-  -o --order-list     Generate order list.
+  -s --instock        Generate empty instock list.
+  -o --order          Generate order list.
+  -n --nutrition      It requires calorieninjas.com api key as
+                      FOOD_API_KEY environment variable.
   -p --people NUMBER  Number of peaople. [default: 70]
   -d --days NUMBER    Number of days. In 1 or 1-3 or 1,2,5 form.
                       [default: 0-10]
   -m --nomenu         Skip menu selection and use switches instead.
-  -n --nutrition      It requires calorieninjas.com api key as
-                      FOOD_API_KEY environment variable.
   -v                  Print output table to screen.
 '''
 import copy
@@ -197,34 +197,43 @@ def main() -> None:
     data = Data(path=DATA_DIR)
     cp = Calcprods(data, people, days)
 
+    choice: str = ''
+
     if not args['--nomenu']:
         options: list[str] = ['[1] Generate stock list with empty values',
                               '[2] Calculate ePromo order list',
                               '[3] Get nutritional values']
+
         terminal_menu = TerminalMenu(options)
         menu_entry_index = terminal_menu.show()
 
         if menu_entry_index == 0:
-            data.write_csv(STOCK_OUT_PATH, cp.get_empty_instock_list())
-            print_list(cp.get_empty_instock_list()) if args['-v'] >= 1 else ...
+            choice = 'instock'
         elif menu_entry_index == 1:
-            data.write_csv(PREP_OUT_PATH, cp.get_order_list(STOCK_IN_PATH))
-            print_list(cp.get_order_list(STOCK_IN_PATH)) if args['-v'] >= 1 else ...
+            choice = 'order'
         elif menu_entry_index == 2:
+            choice = 'nutrition'
+
+    if args['--instock']:
+        choice = 'instock'
+    elif args['--order']:
+        choice = 'order'
+    elif args['--nutrition']:
+        choice = 'nutrition'
+
+    match choice:
+        case 'instock':
+            instock = cp.get_empty_instock_list()
+            data.write_csv(STOCK_OUT_PATH, instock)
+            print_list(instock) if args['-v'] >= 1 else ...
+        case 'order':
+            order = cp.get_order_list(STOCK_IN_PATH)
+            data.write_csv(PREP_OUT_PATH, order)
+            print_list(order) if args['-v'] >= 1 else ...
+        case 'nutrition':
             nu = Nutrition(cp.ingredient_names)
             data.write_csv(NUTRITION_OUT_PATH, nu.nutrition)
             print_list(nu.nutrition) if args['-v'] >= 1 else ...
-
-    if args['--instock-list']:
-        data.write_csv(STOCK_OUT_PATH, cp.get_empty_instock_list())
-        print_list(cp.get_empty_instock_list()) if args['-v'] >= 1 else ...
-    elif args['--order-list']:
-        data.write_csv(PREP_OUT_PATH, cp.get_order_list(STOCK_IN_PATH))
-        print_list(cp.get_order_list(STOCK_IN_PATH)) if args['-v'] >= 1 else ...
-    elif args['--nutrition']:
-        nu = Nutrition(cp.ingredient_names)
-        data.write_csv(NUTRITION_OUT_PATH, nu.nutrition)
-        print_list(nu.nutrition) if args['-v'] >= 1 else ...
 
 
 if __name__ == '__main__':
