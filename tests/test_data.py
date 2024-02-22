@@ -1,6 +1,8 @@
+import pytest
+
 from pathlib import Path
 
-from utils.data import Data, Ingredient, UnitOfMeasurement
+from utils.data import Data, Ingredient, Macros, UnitOfMeasurement
 
 
 def test_tight_dict():
@@ -43,3 +45,37 @@ def test_read_csv():
     assert data.read_csv(STOCK_IN_PATH) == [
         Ingredient('water', 35.0, UnitOfMeasurement('ml'))
     ]
+
+
+def test_read_csv_value_error():
+    data = Data(path='io_data')
+    STOCK_IN_PATH = Path('tests/nonexist/day1.main.csv')
+
+    with pytest.raises(ValueError) as exc_info:
+        data.read_csv(STOCK_IN_PATH)
+
+    assert exc_info.value.args[0] == \
+        "tests/nonexist/day1.main.csv doesn't exist. Create new " \
+        "empty tests/nonexist/day1.main.csv, fill it out and add " \
+        "it to data/."
+
+
+def test_obj_to_dict_for_csv_with_Ingredient_obj():
+    data = Data(path='io_data')
+    ingr = Ingredient('water', 35.0, UnitOfMeasurement('ml'))
+    assert data.obj_to_dict_for_csv([ingr]) == [
+        {'name': 'water', 'quantity': 35.0, 'unit': 'ml'}
+    ]
+
+
+def test_obj_to_dict_for_csv_with_Macros_obj():
+    data = Data(path='io_data')
+    ingr = Macros('carrots', 35, 8, 1, 2, '87/9/5')
+    assert data.obj_to_dict_for_csv([ingr]) == [{
+        'calories_kcal': 35,
+        'carbs_g': 8,
+        'fat_g': 2,
+        'macros': '87/9/5',
+        'name': 'carrots',
+        'protein_g': 1,
+    }]

@@ -28,6 +28,7 @@ Options:
 import copy
 
 from docopt import docopt
+from pathlib import Path
 from simple_term_menu import TerminalMenu  # type: ignore
 
 from utils.consts import (STOCK_OUT_PATH, PREP_OUT_PATH, NUTRITION_OUT_PATH,
@@ -154,7 +155,7 @@ class Calcprods:
 
         return stock
 
-    def get_order_list(self) -> list[Ingredient]:
+    def get_order_list(self, stock_in_path: Path) -> list[Ingredient]:
         ''' Calculate how much of the ingredients to order.
 
         Gets stock, days, people and calculate how much of produce to order.
@@ -166,12 +167,12 @@ class Calcprods:
             list[Ingredient]: of what and how much to order.
         '''
         required_ingredients: list[Ingredient] = self._ingredients_processed
-        instock_ingredients = self.data.read_csv(STOCK_IN_PATH)
+        instock_ingredients = self.data.read_csv(stock_in_path)
 
         if len(required_ingredients) != len(instock_ingredients):
             raise ValueError(
-                f'Length of `{STOCK_IN_PATH}` and current order doesn\'t '
-                f'match. Make sure that `{STOCK_IN_PATH}` was generated using'
+                f'Length of `{stock_in_path}` and current order doesn\'t '
+                f'match. Make sure that `{stock_in_path}` was generated using'
                 'same days nd people values as is used now.')
 
         processed_ingredients: list[Ingredient] = []
@@ -207,8 +208,8 @@ def main() -> None:
             data.write_csv(STOCK_OUT_PATH, cp.get_empty_instock_list())
             print_list(cp.get_empty_instock_list()) if args['-v'] >= 1 else ...
         elif menu_entry_index == 1:
-            data.write_csv(PREP_OUT_PATH, cp.get_order_list())
-            print_list(cp.get_order_list()) if args['-v'] >= 1 else ...
+            data.write_csv(PREP_OUT_PATH, cp.get_order_list(STOCK_IN_PATH))
+            print_list(cp.get_order_list(STOCK_IN_PATH)) if args['-v'] >= 1 else ...
         elif menu_entry_index == 2:
             nu = Nutrition(cp.ingredient_names)
             data.write_csv(NUTRITION_OUT_PATH, nu.nutrition)
@@ -218,8 +219,8 @@ def main() -> None:
         data.write_csv(STOCK_OUT_PATH, cp.get_empty_instock_list())
         print_list(cp.get_empty_instock_list()) if args['-v'] >= 1 else ...
     elif args['--order-list']:
-        data.write_csv(PREP_OUT_PATH, cp.get_order_list())
-        print_list(cp.get_order_list()) if args['-v'] >= 1 else ...
+        data.write_csv(PREP_OUT_PATH, cp.get_order_list(STOCK_IN_PATH))
+        print_list(cp.get_order_list(STOCK_IN_PATH)) if args['-v'] >= 1 else ...
     elif args['--nutrition']:
         nu = Nutrition(cp.ingredient_names)
         data.write_csv(NUTRITION_OUT_PATH, nu.nutrition)

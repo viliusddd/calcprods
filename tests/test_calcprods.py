@@ -1,9 +1,11 @@
+from pathlib import Path
+
 from calcprods import Calcprods
 from utils.data import Data, Ingredient, UnitOfMeasurement
 from utils.consts import DATA_DIR
 
 
-def test_data():
+def test_calcprods_var_data():
     DATA_DIR = 'tests/io_data'
     data = Data(path=DATA_DIR)
     cp = Calcprods(data, 60, [0])
@@ -11,7 +13,7 @@ def test_data():
     assert cp.data == data
 
 
-def test_people():
+def test_calcprods_var_people():
     DATA_DIR = 'tests/io_data'
     data = Data(path=DATA_DIR)
     cp = Calcprods(data, 60, [0])
@@ -19,7 +21,7 @@ def test_people():
     assert cp.people == 60
 
 
-def test_days():
+def test_calcprods_var_days():
     DATA_DIR = 'tests/io_data'
     data = Data(path=DATA_DIR)
     cp = Calcprods(data, 60, [0, 1, 3])
@@ -74,19 +76,22 @@ def test_get_empty_instock_list():
     cp = Calcprods(data, 60, [0])
 
     assert cp.get_empty_instock_list() == [
-        Ingredient('carrots', '', UnitOfMeasurement.kg),
-        Ingredient('sunflower oil', '', UnitOfMeasurement.ml),
+        Ingredient('carrots', 0.07, UnitOfMeasurement.kg),
+        Ingredient('sunflower oil', 0.0, UnitOfMeasurement.ml),
     ]
 
 
 def test_get_order_list():
     DATA_DIR = 'tests/io_data'
+    STOCK_IN_PATH = Path('tests/io_data/instock.csv')
+
     data = Data(path=DATA_DIR)
     cp = Calcprods(data, 60, [0, 1])
 
-    assert cp.get_order_list() == [
-        Ingredient('carrots', 14.2, UnitOfMeasurement.kg),
-        Ingredient('macaroni', 24.2, UnitOfMeasurement.kg),
-        Ingredient('soy sauce', 1.2, UnitOfMeasurement.cup),
-        Ingredient('water', 19200.0, UnitOfMeasurement.ml),
+    assert cp.get_order_list(STOCK_IN_PATH) == [
+        Ingredient('carrots', 4.13, UnitOfMeasurement.kg),
+        Ingredient('macaroni', 4.13, UnitOfMeasurement.kg),
+        Ingredient('soy sauce', 1.18, UnitOfMeasurement.cup),
+        Ingredient('sunflower oil', 0.0, UnitOfMeasurement.ml),
+        Ingredient('water', 18880.0, UnitOfMeasurement.ml),
     ]

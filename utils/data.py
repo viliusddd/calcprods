@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
-from utils.consts import STOCK_FILENAME, DATA_DIR
+from utils.consts import DATA_DIR
 
 
 @dataclass
@@ -120,7 +120,7 @@ class Data:
 
         if not Path(filepath).exists():
             raise ValueError(
-                f"{filepath} doesn't exist. Create new empty {STOCK_FILENAME},"
+                f"{filepath} doesn't exist. Create new empty {filepath},"
                 f' fill it out and add it to {DATA_DIR}/.'
             )
 

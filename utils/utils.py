@@ -8,8 +8,16 @@ from utils.data import Data, Ingredient, Macros
 def tabulate_data(rows: list[Ingredient] | list[Macros]) -> str:
     rows_dict = Data.obj_to_dict_for_csv(rows)
 
+    colalign = ('right', 'left', 'right', 'right')
+    if isinstance(rows[0], Macros):
+        colalign = ('right', 'left', 'right', 'right', 'right', 'right', 'right')
+
     return tabulate(
-        rows_dict, headers='keys', tablefmt='rounded_grid', showindex=True
+        rows_dict,
+        headers='keys',
+        tablefmt='rounded_grid',
+        showindex=True,
+        colalign=colalign,
     )
 
 
