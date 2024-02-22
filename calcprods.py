@@ -23,7 +23,7 @@ Options:
   -m --nomenu         Skip menu selection and use switches instead.
   -n --nutrition      It requires calorieninjas.com api key as
                       FOOD_API_KEY environment variable.
-  -v                  Increase verbosity.
+  -v                  Print table of output to screen.
 '''
 import copy
 
