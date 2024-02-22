@@ -1,6 +1,6 @@
 # CalcProds App
 
-## Setup development environment
+## Setup Development Environment
 
 Requires python 3.12
 1. Create virtual environment and install requirements:
@@ -15,10 +15,10 @@ Requires python 3.12
     ```
 
 ## Command Line Interface Help
-```
 Generate list of ingredients with the quantity for particular number of days and people. Get the nutrition values of ingredients.
 This app is can be used in multiple day retreat kitchens, but it is optimized for Dhamma.org meditation center kitchen, where courses happen multiple times a year.
 
+```
 Usage: calcprods [-osnm] [-p PEOPLE] [-d DAYS] [-v|-vv|-q]
 
 Try:

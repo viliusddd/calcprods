@@ -30,15 +30,16 @@ Options:
 import copy
 
 from docopt import docopt
-from simple_term_menu import TerminalMenu
+from simple_term_menu import TerminalMenu  # type: ignore
 
-from utils.consts import *
+from utils.consts import (STOCK_OUT_PATH, PREP_OUT_PATH, NUTRITION_OUT_PATH,
+                          STOCK_IN_PATH, DATA_DIR)
 from utils.data import Data, Ingredient
+from utils.nutrition import Nutrition
 from utils.utils import split_str_to_ints, print_dict, print_list
-from utils.nutrition import get_nutrition
 
 
-type IngredientDict = dict[str, list[Ingredient]]
+type IngredientDict = dict[str, list[Ingredient]]  # type: ignore
 
 
 class Calcprods:
@@ -46,6 +47,8 @@ class Calcprods:
         self._data = data
         self._people = people
         self._days = days
+        self._ingredients_processed: list[Ingredient] = self.list_ingredients()
+        self._ingredient_names: list[str] = [i.name for i in self._ingredients_processed]
 
     @property
     def data(self) -> Data:
@@ -59,7 +62,15 @@ class Calcprods:
     def days(self) -> list[int]:
         return self._days
 
-    def _compare_ingredients(self, ingr_a: Ingredient, ingr_b: Ingredient, subtract = False) -> Ingredient | None:
+    @property
+    def ingredient_names(self) -> list[str]:
+        return self._ingredient_names
+
+    def _get_ingredient_names(self):
+        return
+
+    def _compare_ingredients(self, ingr_a: Ingredient, ingr_b: Ingredient,
+                             subtract=False) -> Ingredient | None:
         '''
         Merge same name Ingredient objs.
         '''
@@ -75,6 +86,7 @@ class Calcprods:
                 quantity=round(quantity, 2),
                 unit=ingr_a.unit
             )
+        return None
 
     def _merge_duplicates(self, ingredients: list[Ingredient]) -> list[Ingredient]:
         '''Merge duplicate Ingredient objs in the list.
@@ -104,7 +116,7 @@ class Calcprods:
 
                     swapped = True
 
-        return [ing for ing in ingredients if ing != None]
+        return [ing for ing in ingredients if ing is not None]
 
     def filter_by_days(self) -> IngredientDict:
         '''Filter current menu by days: only show days that are requested.
@@ -154,10 +166,11 @@ class Calcprods:
         Returns:
             list: list of Ingredient objs without quantity values.
         '''
-        stock: list[Ingredient] = copy.deepcopy(self.list_ingredients())
+        stock: list[Ingredient] = copy.deepcopy(self._ingredients_processed)
 
-        for i in stock:
-            i.quantity = ''
+        ingredients_as_dict: list[dict] = self.data.obj_to_dict_for_csv(stock)
+        for i in ingredients_as_dict:
+            i['quantity'] = ''
 
         return stock
 
@@ -172,21 +185,23 @@ class Calcprods:
         Returns:
             list[Ingredient]: of what and how much to order.
         '''
-        required_ingredients: list[Ingredient] = self.list_ingredients()
+        required_ingredients: list[Ingredient] = self._ingredients_processed
         instock_ingredients = self.data.read_csv(STOCK_IN_PATH)
 
         if len(required_ingredients) != len(instock_ingredients):
             raise ValueError(
-                f'Length of `{STOCK_IN_PATH}` and current order doesn\'t match. '
-                f'Make sure that `{STOCK_IN_PATH}` was generated using same '
-                'days nd people values as is used now.')
+                f'Length of `{STOCK_IN_PATH}` and current order doesn\'t '
+                f'match. Make sure that `{STOCK_IN_PATH}` was generated using'
+                'same days nd people values as is used now.')
 
         processed_ingredients: list[Ingredient] = []
 
         for ingr in required_ingredients:
             ingr.quantity *= self.people
             for stock_ingr in instock_ingredients:
-                if new_ingr := self._compare_ingredients(ingr, stock_ingr, subtract=True):
+                if new_ingr := self._compare_ingredients(
+                    ingr, stock_ingr, subtract=True
+                ):
                     processed_ingredients.append(new_ingr)
 
         return processed_ingredients
@@ -200,6 +215,7 @@ def main() -> None:
 
     data = Data(path=DATA_DIR)
     cp = Calcprods(data, people, days)
+    nu = Nutrition(cp.ingredient_names)
 
     if not args['--nomenu']:
         options: list[str] = ['[1] Generate stock list with empty values',
@@ -214,15 +230,18 @@ def main() -> None:
         elif menu_entry_index == 1:
             data.write_csv(PREP_OUT_PATH, cp.get_order_list())
         elif menu_entry_index == 2:
-            cp.get_nutrition()
+            data.write_csv(NUTRITION_OUT_PATH, nu.nutrition)
+            print_list(nu.nutrition)
 
     if args['--order-list']:
         data.write_csv(PREP_OUT_PATH, cp.get_order_list())
         # print_list(cp.get_order_list())
     elif args['--instock-list']:
         data.write_csv(STOCK_OUT_PATH, cp.get_empty_instock_list())
+        print_list(cp.get_empty_instock_list())
     elif args['--nutrition']:
-        data.write_csv(NUTRITION_OUT_PATH, get_nutrition(cp.get_empty_instock_list()))
+        data.write_csv(NUTRITION_OUT_PATH, nu.nutrition)
+        print_list(nu.nutrition)
 
 
 if __name__ == '__main__':

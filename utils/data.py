@@ -10,6 +10,16 @@ from pathlib import Path
 from utils.consts import STOCK_FILENAME, DATA_DIR
 
 
+@dataclass
+class Macros:
+    name: str
+    calories_kcal: int
+    carbs_g: int
+    protein_g: int
+    fat_g: int
+    macros: str
+
+
 class UnitOfMeasurement(Enum):
     '''
     More units and conversions at
@@ -37,7 +47,7 @@ class Ingredient:
         Question.__dict__ usually returns. Without classes names
         in it or unnecessary double qotes or brackets.
         """
-        return{
+        return {
             'name': self.name,
             'quantity': self.quantity,
             'unit': self.unit.value
@@ -110,7 +120,7 @@ class Data:
 
         if not Path(filepath).exists():
             raise ValueError(
-                f'{filepath} doesn\'t exist. Create new empty {STOCK_FILENAME},'
+                f"{filepath} doesn't exist. Create new empty {STOCK_FILENAME},"
                 f' fill it out and add it to {DATA_DIR}/.'
             )
 
@@ -123,26 +133,36 @@ class Data:
                 ))
         return day
 
-    def write_csv(self, filepath: Path, data: list[Ingredient] | list[dict[str, str]]) -> None:
+    @staticmethod
+    def obj_to_dict_for_csv(data: list[Ingredient]|list[Macros]) -> list[dict]:
+        '''
+        Convert list of obj to list of dictionaries.
+        '''
+        dict_data: list[dict[str, str|float]] = []
+
+        if isinstance(data[0], Ingredient):
+            dict_data = [i.tight_dict() for i in data]  # type: ignore
+
+        elif isinstance(data[0], Macros):
+            dict_data = [i.__dict__ for i in data]
+
+        return dict_data
+
+    def write_csv(self, filepath: Path, data: list[Ingredient]|list[Macros]) -> None:
         '''
         Write data to CSV file. Data can be either list of Ingredient
         object or list of dicts.
 
         Args:
             filepath (Path): filepath of CSV file.
-            data (list[Ingredient] | list[dict[str, str]]): either list
-                of Ingredient objs or list of ingredients nutritional data.
+            data (list[Ingredient] | list[Macros]): either list of Macros
+                or Ingredient objs.
         '''
+        clean_data = self.obj_to_dict_for_csv(data)
+
         Path(filepath).resolve().parent.mkdir(parents=True, exist_ok=True)
 
-        if isinstance(data[0], Ingredient):
-            data = [i.tight_dict() for i in data]
-
-        fieldnames = [item for item in data[0]]
-
         with open(filepath, 'w') as file:
-
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer = csv.DictWriter(file, [item for item in clean_data[0]])
             writer.writeheader()
-
-            writer.writerows(data)
+            writer.writerows(clean_data)
