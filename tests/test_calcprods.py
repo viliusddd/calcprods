@@ -76,8 +76,8 @@ def test_get_empty_instock_list():
     cp = Calcprods(data, 60, [0])
 
     assert cp.get_empty_instock_list() == [
-        Ingredient('carrots', 0.07, UnitOfMeasurement.kg),
-        Ingredient('sunflower oil', 0.0, UnitOfMeasurement.ml),
+        Ingredient('carrots', '', UnitOfMeasurement.kg),
+        Ingredient('sunflower oil', '', UnitOfMeasurement.ml),
     ]
 
 
