@@ -3,8 +3,9 @@ import pytest
 from utils.data import Data
 from calcprods import Calcprods
 from utils.utils import (
-    tabulate_data, print_dict, print_list, split_str_to_ints
+    tabulate_data, split_str_to_ints
 )
+
 
 def test_tabulate_data():
     DATA_DIR = 'tests/io_data'
@@ -18,6 +19,7 @@ def test_tabulate_data():
         '├────┼─────────┼────────────┼────────┤\n' \
         '│  0 │ carrots │       14.2 │ kg     │\n' \
         '╰────┴─────────┴────────────┴────────╯'
+
 
 def test_split_str_to_ints():
     assert split_str_to_ints('1') == [1]

@@ -35,7 +35,7 @@ class Nutrition:
 
         return ingr_with_macros
 
-    def assign_macros_to_ingr(self, response: dict[str, list[dict]]) -> Macros|None:
+    def assign_macros_to_ingr(self, response: dict[str, list[dict]]) -> Macros | None:
         '''
         Create dict with ingredient and it's macro values, add macros in
         percentages.
@@ -53,17 +53,16 @@ class Nutrition:
                 macros = ''
 
             return Macros(
-                name = item['name'],
-                calories_kcal = item['calories'],
-                carbs_g = item['carbohydrates_total_g'],
-                protein_g = item['protein_g'],
-                fat_g = item['fat_total_g'],
-                macros = macros,
+                name=item['name'],
+                calories_kcal=item['calories'],
+                carbs_g=item['carbohydrates_total_g'],
+                protein_g=item['protein_g'],
+                fat_g=item['fat_total_g'],
+                macros=macros,
             )
         return None
 
-
-    def count_macros(self, item: dict[str, str|float]) -> list[float]|None:
+    def count_macros(self, item: dict[str, str | float]) -> list[float] | None:
         '''Calculate carbs, protein and fat percentages.
 
         Each gram of carbohydrates provides 4 calories, protein 4 and

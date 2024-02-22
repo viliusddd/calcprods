@@ -6,12 +6,12 @@ This app iscan be used in multiple day retreat kitchens, but it is
 optimized for Dhamma.org meditation center kitchen, where courses happen
 multiple times a year.
 
-Usage: calcprods [-osnm] [-p PEOPLE] [-d DAYS] [-v|-vv|-q]
+Usage: calcprods [-osnm] [-p PEOPLE] [-d DAYS] [-v]
 
 Try:
   python calcprods.py -p25 -d2-6
   python calcprods.py -p 60 -d 1,2,7 -s --nomenu
-  python calcprods.py -nm -vv
+  python calcprods.py -nm -v
 
 Options:
   -h --help           Show this screen and exit.
@@ -23,7 +23,7 @@ Options:
   -m --nomenu         Skip menu selection and use switches instead.
   -n --nutrition      It requires calorieninjas.com api key as
                       FOOD_API_KEY environment variable.
-  -v                  Print table of output to screen.
+  -v                  Print output table to screen.
 '''
 import copy
 
@@ -34,7 +34,7 @@ from utils.consts import (STOCK_OUT_PATH, PREP_OUT_PATH, NUTRITION_OUT_PATH,
                           STOCK_IN_PATH, DATA_DIR)
 from utils.data import Data, Ingredient
 from utils.nutrition import Nutrition
-from utils.utils import split_str_to_ints, print_dict, print_list
+from utils.utils import split_str_to_ints, print_list
 
 
 type IngredientDict = dict[str, list[Ingredient]]  # type: ignore
@@ -103,10 +103,12 @@ class Calcprods:
         for i in range(n-1):
             for j in range(0, n-i-1):
 
-                if ingredients[j + 1] == None:
+                if ingredients[j + 1] is None:
                     break
 
-                if new_ingr := self._compare_ingredients(ingredients[j], ingredients[j + 1]):
+                if new_ingr := self._compare_ingredients(
+                    ingredients[j], ingredients[j + 1]
+                ):
                     ingredients[j], ingredients[j + 1] = None, new_ingr
 
                     swapped = True

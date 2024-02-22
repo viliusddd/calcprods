@@ -134,11 +134,11 @@ class Data:
         return day
 
     @staticmethod
-    def obj_to_dict_for_csv(data: list[Ingredient]|list[Macros]) -> list[dict]:
+    def obj_to_dict_for_csv(data: list[Ingredient] | list[Macros]) -> list[dict]:
         '''
         Convert list of obj to list of dictionaries.
         '''
-        dict_data: list[dict[str, str|float]] = []
+        dict_data: list[dict[str, str | float]] = []
 
         if isinstance(data[0], Ingredient):
             dict_data = [i.tight_dict() for i in data]  # type: ignore
@@ -148,7 +148,7 @@ class Data:
 
         return dict_data
 
-    def write_csv(self, filepath: Path, data: list[Ingredient]|list[Macros]) -> None:
+    def write_csv(self, filepath: Path, data: list[Ingredient] | list[Macros]) -> None:
         '''
         Write data to CSV file. Data can be either list of Ingredient
         object or list of dicts.

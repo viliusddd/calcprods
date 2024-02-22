@@ -15,6 +15,7 @@ def test_tight_dict():
         'unit': 'kg',
     }
 
+
 def test_get_days():
     data = Data(path='io_data')
     assert data.get_days('tests/io_data/') == {
@@ -34,6 +35,7 @@ def test_get_days():
             Ingredient('water', 35.0, UnitOfMeasurement.ml),
         ],
     }
+
 
 def test_read_csv():
     data = Data(path='io_data')

@@ -1,4 +1,3 @@
-import copy
 import requests
 
 from tabulate import tabulate
@@ -6,7 +5,7 @@ from tabulate import tabulate
 from utils.data import Data, Ingredient, Macros
 
 
-def tabulate_data(rows: list[Ingredient]|list[Macros]) -> str:
+def tabulate_data(rows: list[Ingredient] | list[Macros]) -> str:
     rows_dict = Data.obj_to_dict_for_csv(rows)
 
     return tabulate(
@@ -14,14 +13,8 @@ def tabulate_data(rows: list[Ingredient]|list[Macros]) -> str:
     )
 
 
-def print_list(ingredients: list[Ingredient]|list[Macros]) -> None:
+def print_list(ingredients: list[Ingredient] | list[Macros]) -> None:
     print(tabulate_data(ingredients))
-
-
-def print_dict(input: dict) -> None:
-    for day, products in input.items():
-        print(f'{day.capitalize()}:')
-        print(tabulate_data(products))
 
 
 def split_str_to_ints(digits: str) -> list[int]:
@@ -50,7 +43,8 @@ def split_str_to_ints(digits: str) -> list[int]:
     return nums
 
 
-def get_api_response(url: str, headers=None) -> dict[str, list[dict[str, str|float]]] | None:
+def get_api_response(url: str, headers=None) \
+        -> dict[str, list[dict[str, str | float]]] | None:
     """
     Connect to chosen api and return json response.
 
