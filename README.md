@@ -13,7 +13,10 @@ Requires python 3.12
     ```bash
     echo 'export FOOD_API_KEY="<your_api_key_goes_here>"' >> ~/.zshrc
     ```
-3. Copy files from `example/` to `data/`
+3. Copy files from `example/` to `data/`:
+    ```bash
+    mkdir data/ && cp -r example/* data/
+    ```
 
 ## Command Line Interface Help
 Generate list of ingredients with the quantity for particular number of days and people. Get the nutrition values of ingredients.
