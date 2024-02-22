@@ -149,9 +149,8 @@ class Calcprods:
         '''
         stock: list[Ingredient] = copy.deepcopy(self._ingredients_processed)
 
-        ingredients_as_dict: list[dict] = self.data.obj_to_dict_for_csv(stock)
-        for i in ingredients_as_dict:
-            i['quantity'] = ''
+        for i in stock:
+            i.quantity = ''  # type: ignore
 
         return stock
 
@@ -184,6 +183,9 @@ class Calcprods:
                     ingr, stock_ingr, subtract=True
                 ):
                     processed_ingredients.append(new_ingr)
+
+        for i in processed_ingredients:
+            i.quantity = round(i.quantity, 2)
 
         return processed_ingredients
 
