@@ -23,9 +23,7 @@ Options:
   -m --nomenu         Skip menu selection and use switches instead.
   -n --nutrition      It requires calorieninjas.com api key as
                       FOOD_API_KEY environment variable.
-  -v --verbose        Increase verbosity.
-  -vv                 Very verbose: print tabulated data to terminal.
-  -q --quiet          Decrease verbosity.
+  -v                  Increase verbosity.
 '''
 import copy
 
@@ -65,9 +63,6 @@ class Calcprods:
     @property
     def ingredient_names(self) -> list[str]:
         return self._ingredient_names
-
-    def _get_ingredient_names(self):
-        return
 
     def _compare_ingredients(self, ingr_a: Ingredient, ingr_b: Ingredient,
                              subtract=False) -> Ingredient | None:
@@ -117,23 +112,6 @@ class Calcprods:
                     swapped = True
 
         return [ing for ing in ingredients if ing is not None]
-
-    def filter_by_days(self) -> IngredientDict:
-        '''Filter current menu by days: only show days that are requested.
-
-        Args:
-            data (IngredientDict): all available days of menu ingredients.
-
-        Returns:
-            IngredientDict: only the requested days.
-        '''
-        filtered_by_days = {}
-
-        for day_name, day_val in self.data.menu.items():
-            if int(day_name[3]) in self.days:
-                filtered_by_days[day_name] = day_val
-
-        return filtered_by_days
 
     def list_ingredients(self) -> list[Ingredient]:
         '''
@@ -215,7 +193,6 @@ def main() -> None:
 
     data = Data(path=DATA_DIR)
     cp = Calcprods(data, people, days)
-    nu = Nutrition(cp.ingredient_names)
 
     if not args['--nomenu']:
         options: list[str] = ['[1] Generate stock list with empty values',
@@ -225,23 +202,26 @@ def main() -> None:
         menu_entry_index = terminal_menu.show()
 
         if menu_entry_index == 0:
-            instock = cp.get_empty_instock_list()
-            data.write_csv(STOCK_OUT_PATH, instock)
+            data.write_csv(STOCK_OUT_PATH, cp.get_empty_instock_list())
+            print_list(cp.get_empty_instock_list()) if args['-v'] >= 1 else ...
         elif menu_entry_index == 1:
             data.write_csv(PREP_OUT_PATH, cp.get_order_list())
+            print_list(cp.get_order_list()) if args['-v'] >= 1 else ...
         elif menu_entry_index == 2:
+            nu = Nutrition(cp.ingredient_names)
             data.write_csv(NUTRITION_OUT_PATH, nu.nutrition)
-            print_list(nu.nutrition)
+            print_list(nu.nutrition) if args['-v'] >= 1 else ...
 
-    if args['--order-list']:
-        data.write_csv(PREP_OUT_PATH, cp.get_order_list())
-        # print_list(cp.get_order_list())
-    elif args['--instock-list']:
+    if args['--instock-list']:
         data.write_csv(STOCK_OUT_PATH, cp.get_empty_instock_list())
-        print_list(cp.get_empty_instock_list())
+        print_list(cp.get_empty_instock_list()) if args['-v'] >= 1 else ...
+    elif args['--order-list']:
+        data.write_csv(PREP_OUT_PATH, cp.get_order_list())
+        print_list(cp.get_order_list()) if args['-v'] >= 1 else ...
     elif args['--nutrition']:
+        nu = Nutrition(cp.ingredient_names)
         data.write_csv(NUTRITION_OUT_PATH, nu.nutrition)
-        print_list(nu.nutrition)
+        print_list(nu.nutrition) if args['-v'] >= 1 else ...
 
 
 if __name__ == '__main__':
