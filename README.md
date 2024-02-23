@@ -15,7 +15,7 @@ Requires python 3.12
     ```
 3. Copy files from `example/` to `data/`:
     ```bash
-    mkdir data/ && cp -r example/* data/
+    mkdir data/ && cp -r example/* $_
     ```
 
 ## 
@@ -46,4 +46,4 @@ Options:
   -v                  Print output table to the terminal.
 ```
 
-> Link to original project repo: `https://github.com/viliusddd/calcprods`
+> Link to the original project repository: [github.com/viliusddd/calcprods](https://github.com/viliusddd/calcprods)
