@@ -30,6 +30,7 @@ def test_calcprods_var_days():
 
 
 def test_compare_ingredients():
+    DATA_DIR = 'tests/io_data'
     data = Data(path=DATA_DIR)
     cp = Calcprods(data, 60, [1])
 
@@ -43,6 +44,7 @@ def test_compare_ingredients():
 
 
 def test_merge_duplicates():
+    DATA_DIR = 'tests/io_data'
     data = Data(path=DATA_DIR)
     cp = Calcprods(data, 60, [1])
     ings = [

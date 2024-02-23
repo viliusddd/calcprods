@@ -73,6 +73,8 @@ class Data:
     '''
     def __init__(self, path: str) -> None:
         self.menu: dict[str, list[Ingredient]] = self.get_days(path)
+        if not self.menu:
+            raise ValueError(f'No Ingredients were found in files at `{path}`')
 
     def get_days(self, csv_dir: str) -> dict[str, list[Ingredient]]:
         '''
@@ -93,7 +95,16 @@ class Data:
                     'day1.cake': [...]
                 }
         '''
+        if not Path(csv_dir).is_dir():
+            raise ValueError(f'Expected `{csv_dir}` directory doesn\'t exist.')
+
+        if not any(Path(csv_dir).iterdir()):
+            raise ValueError(f'There are no files to process in `{csv_dir}`.')
+
         filepaths = glob.glob(f'{csv_dir}/day*.csv')
+        if not filepaths:
+            raise ValueError(f'There are no matching files in `{csv_dir}` to process.')
+
         pattern = re.compile(r'^((day\d)\.?(\d|\w+)?)\.csv$', re.IGNORECASE)
 
         days: dict[str, list[Ingredient]] = {}
@@ -103,7 +114,8 @@ class Data:
 
             if match := re.match(pattern, filename):
                 day_name = match.group(1)
-                days[day_name] = self.read_csv(Path(filepath))
+                if self.read_csv(Path(filepath)):
+                    days[day_name] = self.read_csv(Path(filepath))
 
         return days
 
@@ -133,21 +145,6 @@ class Data:
                 ))
         return day
 
-    @staticmethod
-    def obj_to_dict_for_csv(data: list[Ingredient] | list[Macros]) -> list[dict]:
-        '''
-        Convert list of obj to list of dictionaries.
-        '''
-        dict_data: list[dict[str, str | float]] = []
-
-        if isinstance(data[0], Ingredient):
-            dict_data = [i.tight_dict() for i in data]  # type: ignore
-
-        elif isinstance(data[0], Macros):
-            dict_data = [i.__dict__ for i in data]
-
-        return dict_data
-
     def write_csv(self, filepath: Path, data: list[Ingredient] | list[Macros]) -> None:
         '''
         Write data to CSV file. Data can be either list of Ingredient
@@ -166,3 +163,18 @@ class Data:
             writer = csv.DictWriter(file, [item for item in clean_data[0]])
             writer.writeheader()
             writer.writerows(clean_data)
+
+    @staticmethod
+    def obj_to_dict_for_csv(data: list[Ingredient] | list[Macros]) -> list[dict]:
+        '''
+        Convert list of obj to list of dictionaries.
+        '''
+        dict_data: list[dict[str, str | float]] = []
+
+        if isinstance(data[0], Ingredient):
+            dict_data = [i.tight_dict() for i in data]  # type: ignore
+
+        elif isinstance(data[0], Macros):
+            dict_data = [i.__dict__ for i in data]
+
+        return dict_data

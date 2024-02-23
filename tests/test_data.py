@@ -19,7 +19,7 @@ def test_tight_dict():
 
 
 def test_get_days():
-    data = Data(path='io_data')
+    data = Data(path='tests/io_data')
     assert data.get_days('tests/io_data/') == {
         'day0': [
             Ingredient('carrots', 0.07, UnitOfMeasurement.kg),
@@ -40,7 +40,7 @@ def test_get_days():
 
 
 def test_read_csv():
-    data = Data(path='io_data')
+    data = Data(path='tests/io_data')
     STOCK_IN_PATH = Path('tests/io_data/day1.main.csv')
     assert data.read_csv(STOCK_IN_PATH) == [
         Ingredient('water', 35.0, UnitOfMeasurement('ml'))
@@ -48,7 +48,7 @@ def test_read_csv():
 
 
 def test_read_csv_value_error():
-    data = Data(path='io_data')
+    data = Data(path='tests/io_data')
     STOCK_IN_PATH = Path('tests/nonexist/day1.main.csv')
 
     with pytest.raises(ValueError) as exc_info:
@@ -61,7 +61,7 @@ def test_read_csv_value_error():
 
 
 def test_obj_to_dict_for_csv_with_Ingredient_obj():
-    data = Data(path='io_data')
+    data = Data(path='tests/io_data')
     ingr = Ingredient('water', 35.0, UnitOfMeasurement('ml'))
     assert data.obj_to_dict_for_csv([ingr]) == [
         {'name': 'water', 'quantity': 35.0, 'unit': 'ml'}
@@ -69,7 +69,7 @@ def test_obj_to_dict_for_csv_with_Ingredient_obj():
 
 
 def test_obj_to_dict_for_csv_with_Macros_obj():
-    data = Data(path='io_data')
+    data = Data(path='tests/io_data')
     ingr = Macros('carrots', 35, 8, 1, 2, '87/9/5')
     assert data.obj_to_dict_for_csv([ingr]) == [{
         'calories_kcal': 35,
