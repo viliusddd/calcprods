@@ -18,6 +18,10 @@ Requires python 3.12
     mkdir data/ && cp -r example/* data/
     ```
 
+## 
+Program expects files matching `day<number>.<anysimbol(s)>.csv` or `day<number>.csv` naming convention.
+`<number>` indicates which day ingredients they are and user can choose days with `-d --days` switch.
+
 ## Command Line Interface Help
 Generate list of ingredients with the quantity for particular number of days and people. Get the nutrition values of ingredients.
 This app is can be used in multiple day retreat kitchens, but it is optimized for Dhamma.org meditation center kitchen, where courses happen multiple times a year.
