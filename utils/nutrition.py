@@ -1,4 +1,5 @@
-from utils.consts import FOOD_API_KEY
+from dotenv import load_dotenv
+from os import getenv
 from utils.data import Macros
 from utils.utils import get_api_response
 
@@ -7,6 +8,8 @@ class Nutrition:
     def __init__(self, names: list[str]) -> None:
         self.names = names
         self.nutrition: list[Macros] = self.get_nutrition()
+
+        load_dotenv()
 
     def get_nutrition(self) -> list[Macros]:
         '''
@@ -24,7 +27,7 @@ class Nutrition:
             ]
         '''
         url = 'https://api.calorieninjas.com/v1/nutrition?query='
-        headers = {'X-Api-Key': FOOD_API_KEY}
+        headers = {'X-Api-Key': getenv('FOOD_API_KEY')}
 
         ingr_with_macros: list[Macros] = []
 
