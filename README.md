@@ -30,7 +30,7 @@ Program expects files matching `day<number>.<anysimbol(s)>.csv` or `day<number>.
 `<number>` indicates which day ingredients they are and user can choose days with `-d --days` switch.
 
 ## Command Line Interface
-```prolog
+```
 Usage: calcprods [-s|-o|-n] [-p PEOPLE] [-d DAYS] [-vmh]
 
 Try:
