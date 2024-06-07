@@ -4,11 +4,12 @@ from tabulate import tabulate
 
 from utils.data import Data, Ingredient, Macros
 
+type colalign_type = tuple[str, str, str, str] | tuple[str, str, str, str, str, str, str]  # type: ignore
 
 def tabulate_data(rows: list[Ingredient] | list[Macros]) -> str:
     rows_dict = Data.obj_to_dict_for_csv(rows)
 
-    colalign = ('right', 'left', 'right', 'right')
+    colalign: colalign_type = ('right', 'left', 'right', 'right')
     if isinstance(rows[0], Macros):
         colalign = ('right', 'left', 'right', 'right', 'right', 'right', 'right')
 
