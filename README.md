@@ -3,9 +3,14 @@
 Generate list of ingredients with the quantity for particular number of days and people. Get the nutrition values of ingredients.
 This app is can be used in multiple day retreat kitchens, but it is optimized for Dhamma.org meditation center kitchen, where courses happen multiple times a year.
 
-## Setup Development Environment
+- [CalcProds App](#calcprods-app)
+  - [Setup Dev Environment](#setup-dev-environment)
+  - [Command Line Interface](#command-line-interface)
 
-Requires python 3.12
+## Setup Dev Environment
+
+> [!IMPORTANT] Requires Python 3.12+
+
 1. Create virtual environment and install requirements:
     ```bash
     python3.12 -m venv .venv
@@ -18,15 +23,14 @@ Requires python 3.12
     ```
 3. Copy files from `example/` to `data/`:
     ```bash
-    mkdir data/ && cp -r example/* $_
+    mkdir -p data/ && cp -r example/* $_
     ```
 
-##
 Program expects files matching `day<number>.<anysimbol(s)>.csv` or `day<number>.csv` naming convention.
 `<number>` indicates which day ingredients they are and user can choose days with `-d --days` switch.
 
-## Command Line Interface Help
-```
+## Command Line Interface
+```prolog
 Usage: calcprods [-s|-o|-n] [-p PEOPLE] [-d DAYS] [-vmh]
 
 Try:
@@ -46,5 +50,3 @@ Options:
   -m --nomenu         Skip menu selection and use switches instead.
   -v                  Print output table to the terminal.
 ```
-
-> Link to the original project repository: [github.com/viliusddd/calcprods](https://github.com/viliusddd/calcprods)
