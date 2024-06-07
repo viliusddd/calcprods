@@ -1,30 +1,31 @@
 # CalcProds App
 
+Generate list of ingredients with the quantity for particular number of days and people. Get the nutrition values of ingredients.
+This app is can be used in multiple day retreat kitchens, but it is optimized for Dhamma.org meditation center kitchen, where courses happen multiple times a year.
+
 ## Setup Development Environment
 
 Requires python 3.12
 1. Create virtual environment and install requirements:
     ```bash
     python3.12 -m venv .venv
-    source ./venv/bin/activate
+    . ./venv/bin/activate
     pip install -r requirements.txt
     ```
-2. Get free `API` key from `calorieninjas.com` and set it to `FOOD_API_KEY` env var:
+2. Get free `API` key from `calorieninjas.com` and make set it to `FOOD_API_KEY` env var:
     ```bash
-    echo 'export FOOD_API_KEY="<your_api_key_goes_here>"' >> ~/.zshrc
+    echo FOOD_API_KEY='<your_api_key_here>' > .env
     ```
 3. Copy files from `example/` to `data/`:
     ```bash
     mkdir data/ && cp -r example/* $_
     ```
 
-## 
+##
 Program expects files matching `day<number>.<anysimbol(s)>.csv` or `day<number>.csv` naming convention.
 `<number>` indicates which day ingredients they are and user can choose days with `-d --days` switch.
 
 ## Command Line Interface Help
-Generate list of ingredients with the quantity for particular number of days and people. Get the nutrition values of ingredients.
-This app is can be used in multiple day retreat kitchens, but it is optimized for Dhamma.org meditation center kitchen, where courses happen multiple times a year.
 ```
 Usage: calcprods [-s|-o|-n] [-p PEOPLE] [-d DAYS] [-vmh]
 
