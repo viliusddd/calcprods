@@ -9,7 +9,7 @@ Requires python 3.12
 1. Create virtual environment and install requirements:
     ```bash
     python3.12 -m venv .venv
-    . ./venv/bin/activate
+    . .venv/bin/activate
     pip install -r requirements.txt
     ```
 2. Get free `API` key from `calorieninjas.com` and make set it to `FOOD_API_KEY` env var:
