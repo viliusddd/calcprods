@@ -1,0 +1,6 @@
+.pytest_cache
+.venv
+.env
+wd_1_4_4.ipynb
+out/
+data/*
