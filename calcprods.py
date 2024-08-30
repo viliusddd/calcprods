@@ -9,9 +9,9 @@ multiple times a year.
 Usage: calcprods [-s|-o|-n] [-p PEOPLE] [-d DAYS] [-vmh]
 
 Try:
-  python calcprods.py -p25 -d2-6
-  python calcprods.py -p 60 -d 1,2,7 -s --nomenu
-  python calcprods.py -nm -v
+  ./calcprods.py -p25 -d2-6
+  ./calcprods.py -p 60 -d 1,2,7 -s --nomenu
+  ./calcprods.py -nm -v
 
 Options:
   -h --help           Show this screen and exit.
