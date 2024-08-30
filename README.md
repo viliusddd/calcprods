@@ -1,8 +1,8 @@
-# CalcProds
+# CalcProds 👨🏼‍🍳
 
 Need to feed a small army of meditators? This app calculates everything from carrots to calories, ensuring you have just the right amount of zen in your kitchen!
 
-- [CalcProds](#calcprods)
+- [CalcProds 👨🏼‍🍳](#calcprods-)
   - [Features](#features)
   - [TL;DR Setup](#tldr-setup)
   - [File naming convention](#file-naming-convention)
