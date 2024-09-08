@@ -191,7 +191,7 @@ class Calcprods:
 
 
 def main() -> None:
-    args = docopt(__doc__, version='0.01')
+    args = docopt(__doc__, version='0.1.0')
 
     days: list[int] = split_str_to_ints(args['--days'])
     people: int = int(args['--people'])
@@ -202,9 +202,11 @@ def main() -> None:
     choice: str = ''
 
     if not args['--nomenu']:
-        options: list[str] = ['[1] Generate stock list with empty values',
-                              '[2] Calculate ePromo order list',
-                              '[3] Get nutritional values']
+        options: list[str] = [
+            '[1] Generate stock list with empty values',
+            '[2] Calculate ePromo order list',
+            '[3] Get nutritional values'
+        ]
 
         terminal_menu = TerminalMenu(options)
         menu_entry_index = terminal_menu.show()
